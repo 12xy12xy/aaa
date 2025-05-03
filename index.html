@@ -1,83 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>home</title>
-<link rel="stylesheet" href="styles.css">
-</head>
-
-
-
+<html>
 <body>
-
-
-
-
-
-<div class="nav">
-
-
-<a href="index.html" class="navlinkbox">  
-<img src="  " loading="lazy" alt="" class="navlinkboximg"/>
-</a>
-
-
-<div href="#" class="navsearchbox">
-<input type="text" id="searchBox" placeholder="Type to search..." autofocus>
-</div>
-
-
-
-<a href="categories.html" class="navlinkbox">
-<img src="  " loading="lazy" alt="" class="navlinkboximg"/>
-</a>
-
-</div>
+  <div>
+    <input type="search" id="search-box" placeholder="Search...">
+    <button id="clear-button">×</button>
+    <div id="search-results"></div>
+  </div>
 
 
 
 
 
 
+  <script>
+    const searchBox = document.getElementById('search-box');
+    const clearButton = document.getElementById('clear-button');
+    const searchResults = document.getElementById('search-results');
+    let searchDataLoaded = false;
 
+    searchBox.addEventListener('focus', () => {
+      if (!searchDataLoaded) {
+        const script = document.createElement('script');
+        script.src = 'searchdata.js';
+        document.body.appendChild(script);
+        searchDataLoaded = true;
 
+        script.onload = () => {
+          searchBox.addEventListener('input', () => {
+            const searchValue = searchBox.value.trim().toLowerCase();
+            if (searchValue !== '') {
+              const filteredData = window.data.filter(item => item.name.toLowerCase().includes(searchValue)).slice(0, 2);
+              let html = '';
+              if (filteredData.length > 0) {
+                filteredData.forEach(item => {
+                  html += `<a href="${item.url}">${item.name}</a><br>`;
+                });
+              } else {
+                html = 'No results found';
+              }
+              searchResults.innerHTML = html;
+              searchResults.style.display = 'block';
+            } else {
+              searchResults.style.display = 'none';
+            }
+          });
+        };
+      }
+    });
 
+    searchBox.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        searchBox.blur();
+      }
+    });
 
-<div class="container">
+    searchBox.addEventListener('blur', () => {
+      // You can add additional logic here if needed
+    });
 
+    clearButton.addEventListener('click', () => {
+      searchBox.value = '';
+      searchBox.blur();
+      searchResults.style.display = 'none';
+    });
 
-        <h1>Search Data</h1>
-
-
-        ///</input type="text" id="searchBox" placeholder="Type to search..." autofocus>
-
-        <button id="clearButton" class="clearButton">Clear</button>
-
-        <div id="dataList"></div>
-
-
-    </div>
-
-
-
-
-
-
-
-<h1>home</h1>
-
-<a href="laptops.html">best laptops may 2025</a>
-   
-   
-<script src="searchdata.js"></script>
-
-<script src="search.js"></script>
-
-
-
-
-
- 
+    // Automatically focus the search box when the page loads
+    searchBox.focus();
+  </script>
 </body>
 </html>
