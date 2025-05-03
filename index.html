@@ -2,21 +2,24 @@
 <html>
 <body>
   <div>
-    <input type="search" id="search-box" placeholder="Search...">
+    <input type="search" id="search-box" placeholder=" search here">
     <button id="clear-button">×</button>
     <div id="search-results"></div>
   </div>
-
-
-
-
-
 
   <script>
     const searchBox = document.getElementById('search-box');
     const clearButton = document.getElementById('clear-button');
     const searchResults = document.getElementById('search-results');
     let searchDataLoaded = false;
+    const suggestions = ['Laptops', 'Mobiles', 'Tablets', 'Gaming Laptops', 'Best Sellers'];
+    let suggestionIndex = 0;
+
+    // Cycle through suggestions and update placeholder text
+    setInterval(() => {
+      searchBox.placeholder = `Search for ${suggestions[suggestionIndex]}`;
+      suggestionIndex = (suggestionIndex + 1) % suggestions.length;
+    }, 2000); // Update every 2 seconds
 
     searchBox.addEventListener('focus', () => {
       if (!searchDataLoaded) {
@@ -54,18 +57,11 @@
       }
     });
 
-    searchBox.addEventListener('blur', () => {
-      // You can add additional logic here if needed
-    });
-
     clearButton.addEventListener('click', () => {
       searchBox.value = '';
       searchBox.blur();
       searchResults.style.display = 'none';
     });
-
-    // Automatically focus the search box when the page loads
-    searchBox.focus();
   </script>
 </body>
 </html>
