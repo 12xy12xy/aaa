@@ -39,8 +39,15 @@ searchBox.addEventListener('blur', function() {
     }
 });
 
+searchBox.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchBox.blur(); // Remove focus and thus hide keyboard on mobile
+    }
+});
+
 clearButton.addEventListener('click', function() {
     searchBox.value = '';
     renderList('');
     clearButton.classList.remove('show');
+    searchBox.blur(); // Hide keyboard on mobile when clear button clicked
 });
