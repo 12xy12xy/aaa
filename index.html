@@ -1,66 +1,120 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <style>
+    body.search-active { overflow: hidden; }
+    .search-wrap { position: relative; }
+    #search-results {
+      display: none;
+      border: 1px solid #ccc;
+      padding: 10px;
+      position: absolute;
+      background-color: #fff;
+      width: 100%;
+    }
+    input[type="search"]::-webkit-search-cancel-button { display: none; }
+    .clear-button {
+      position: absolute;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      display: none;
+    }
+    .clear-typed-button {
+      position: absolute;
+      right: 70px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      display: none;
+    }
+  </style>
+</head>
 <body>
-  <div>
-    <input type="search" id="search-box" placeholder=" search here">
-    <button id="clear-button">×</button>
-    <div id="search-results"></div>
+  <div class="search-wrap">
+    <input type="search" id="search-box" class="search-box" placeholder="search here">
+    <div class="clear-button" id="clear-button">&times;</div>
+    <div class="clear-typed-button" id="clear-typed-button">Clear</div>
   </div>
+  <div id="search-results"></div>
 
   <script>
     const searchBox = document.getElementById('search-box');
-    const clearButton = document.getElementById('clear-button');
     const searchResults = document.getElementById('search-results');
+    const clearButton = document.getElementById('clear-button');
+    const clearTypedButton = document.getElementById('clear-typed-button');
     let searchDataLoaded = false;
     const suggestions = ['Laptops', 'Mobiles', 'Tablets', 'Gaming Laptops', 'Best Sellers'];
     let suggestionIndex = 0;
 
-    // Cycle through suggestions and update placeholder text
     setInterval(() => {
       searchBox.placeholder = `Search for ${suggestions[suggestionIndex]}`;
       suggestionIndex = (suggestionIndex + 1) % suggestions.length;
-    }, 2000); // Update every 2 seconds
+    }, 2000);
 
     searchBox.addEventListener('focus', () => {
+      document.body.classList.add('search-active');
+      searchResults.style.display = 'block';
+      clearButton.style.display = 'block';
       if (!searchDataLoaded) {
         const script = document.createElement('script');
         script.src = 'searchdata.js';
         document.body.appendChild(script);
         searchDataLoaded = true;
-
         script.onload = () => {
-          searchBox.addEventListener('input', () => {
-            const searchValue = searchBox.value.trim().toLowerCase();
-            if (searchValue !== '') {
-              const filteredData = window.data.filter(item => item.name.toLowerCase().includes(searchValue)).slice(0, 2);
-              let html = '';
-              if (filteredData.length > 0) {
-                filteredData.forEach(item => {
-                  html += `<a href="${item.url}">${item.name}</a><br>`;
-                });
-              } else {
-                html = 'No results found';
-              }
-              searchResults.innerHTML = html;
-              searchResults.style.display = 'block';
-            } else {
-              searchResults.style.display = 'none';
-            }
-          });
+          searchBox.addEventListener('input', handleInput);
         };
       }
     });
 
-    searchBox.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        searchBox.blur();
-      }
+    searchBox.addEventListener('blur', () => {
+      document.body.classList.remove('search-active');
+      setTimeout(() => {
+        if (document.activeElement !== searchBox) {
+          searchResults.style.display = 'none';
+          clearButton.style.display = 'none';
+          clearTypedButton.style.display = 'none';
+        }
+      }, 200);
     });
+
+    function handleInput() {
+      const searchValue = searchBox.value.trim().toLowerCase();
+      if (searchValue !== '') {
+        clearTypedButton.style.display = 'block';
+        const filteredData = window.data.filter(item => item.name.toLowerCase().includes(searchValue)).slice(0, 2);
+        let html = '';
+        if (filteredData.length > 0) {
+          filteredData.forEach(item => {
+            html += `<a href="${item.url}">${item.name}</a><br>`;
+          });
+        } else {
+          html = 'No results found';
+        }
+        searchResults.innerHTML = html;
+      } else {
+        searchResults.innerHTML = '';
+        clearTypedButton.style.display = 'none';
+      }
+    }
 
     clearButton.addEventListener('click', () => {
       searchBox.value = '';
+      clearButton.style.display = 'none';
+      clearTypedButton.style.display = 'none';
+      searchResults.innerHTML = '';
       searchBox.blur();
       searchResults.style.display = 'none';
+    });
+
+    clearTypedButton.addEventListener('click', () => {
+      searchBox.value = '';
+      clearTypedButton.style.display = 'none';
+      searchResults.innerHTML = '';
+      searchBox.focus();
     });
   </script>
 </body>
